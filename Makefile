@@ -1,30 +1,37 @@
 # include .env
-GOCMD=go
-GOBUILD=$(GOCMD) build
-GOCLEAN=$(GOCMD) clean
-GOGET=$(GOCMDX) get
-BINARY_NAME=serviceapp
-BINARY_UNIX=$(BINARY_NAME)_unix
+BINARY=taskservice
+DOCKER_COMPOSE = docker-compose
+DOCKER_COMPOSE_FILE = docker-compose.yaml
 
-all: clean format build run
-	@echo "Starting app"
+.PHONY: up start stop restart status ps clean
 
+# dependencies: check-dependencies ## Check dependencies
+vendor:
+	@dep ensure -v
 
-build:
-	@echo "Building application..."
-	$(GOBUILD) -o $(BINARY_NAME) -v
-clean:
-	@echo "Hello from target one..."
-	$(GOCLEAN)
-	rm -f $(BINARY_NAME)
-	rm -f $(BINARY_UNIX)
-	@echo "Done cleaning"
+engine: vendor
+	go build -o ${BINARY}
 
-format:
-	@echo "Format code"
-	$(GOCMD) fmt
+install:
+	go build -o ${BINARY}
 
-run: build
-	@echo "Starting application server..."
-	./$(BINARY_NAME)
-	@echo "Done!"
+up: ## Start all or c=<name> containers in foreground
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up --build $(c)
+
+start: ## Start all or c=<name> containers in background
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d $(c)
+
+stop: ## Stop all or c=<name> containers
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) stop $(c)
+
+restart: ## Restart all or c=<name> containers
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) stop $(c)
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up $(c) -d
+
+status: ## Show status of containers
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) ps
+
+ps: status ## Alias of status
+
+clean: ## Clean all data
+	@$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --rmi local

@@ -1,0 +1,30 @@
+version: '3'
+volumes:
+  database_data:
+    driver: local
+services:
+
+  database:
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    # environment:
+    #   POSTGRES_DB: #<dbname>
+    #   POSTGRES_USER: # dbuser
+    #   POSTGRES_PASSWORD: #dbpassword
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/usr/src/taskservice/
+    links:
+      - database
+    depends_on:
+      - database

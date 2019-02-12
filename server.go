@@ -3,67 +3,40 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/Gidraff/task-manager-service/handlers"
+	"github.com/Gidraff/task-manager-service/middlewares"
+	"github.com/Gidraff/task-manager-service/models"
 	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
-	"github.com/joho/godotenv"
-
-	// Use postgres
-	// _ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/lib/pq"
 )
 
-// Db connection pool
-var Db *gorm.DB
-var err error
 var wait time.Duration
 
-// Load .env file
-func init() {
-	err = godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-
-	dbname := os.Getenv("POSTGRES_DB")
-	user := os.Getenv("POSTGRES_USER")
-	host := os.Getenv("HOST")
-	password := os.Getenv("POSTGRES_PASSWORD")
-
-	connectionString := fmt.Sprintf(
-		"host=%s user=%s dbname=%s password=%s sslmode=disable",
-		host, user, dbname, password)
-
-	Db, err = gorm.Open("postgres", connectionString)
-	if err != nil {
-		panic(err.Error())
-	}
-	log.Printf("Successfully connected to db")
-}
-
 func main() {
-	err = Db.DB().Ping()
+	err := models.GetDB().DB().Ping()
 	if err != nil {
 		log.Fatal(err.Error())
 		os.Exit(1)
 	}
-	defer Db.Close()
+	defer models.GetDB().Close()
 
 	// http server setup
 	flag.DurationVar(&wait, "graceful-timeout", time.Second*15, "15s")
 	flag.Parse()
 
-	r := mux.NewRouter()
+	router := mux.NewRouter()
+	router.Use(middlewares.JwtAuthentication) // attach middleware
+
+	router.HandleFunc("/api/user/new", handlers.CreateAccount).Methods("POST")
 
 	server := &http.Server{
 		Addr:    ":8080",
-		Handler: r,
+		Handler: router,
 	}
 
 	go func() {
