@@ -35,7 +35,6 @@ func init() {
 	}
 	db = dbConnection
 	log.Printf("Connection Established")
-	GetDB().Debug().DropTableIfExists(&Account{}, &Token{})
 	GetDB().Debug().AutoMigrate(&Account{}, &Token{})
 }
 

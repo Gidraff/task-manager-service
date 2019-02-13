@@ -33,6 +33,7 @@ func main() {
 	router.Use(middlewares.JwtAuthentication) // attach middleware
 
 	router.HandleFunc("/api/user/new", handlers.CreateAccount).Methods("POST")
+	router.HandleFunc("/api/user/login", handlers.Authenticate).Methods("POST")
 
 	server := &http.Server{
 		Addr:    ":8080",
