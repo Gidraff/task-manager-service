@@ -20,3 +20,16 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	resp := account.Create() // Create account
 	utils.Respond(w, resp)
 }
+
+// Authenticate authenticates an existing user
+func Authenticate(w http.ResponseWriter, r *http.Request) {
+	account := &models.Account{}
+
+	err := json.NewDecoder(r.Body).Decode(account)
+	if err != nil {
+		utils.Respond(w, utils.Message(false, "Invalid request"))
+		return
+	}
+	response := models.Login(account.Email, account.Password)
+	utils.Respond(w, response)
+}
