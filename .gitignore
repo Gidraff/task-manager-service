@@ -1,2 +1,10 @@
 vendor/
+.dockerfile-*
+.container-*
+.go/
+bin/
+c.out
 .env
+*.out
+*.xml
+*.iml

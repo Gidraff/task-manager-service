@@ -1,0 +1,7 @@
+dsn: "postgres://%s:%s@localhost/%s?sslmode=disable"
+port: ":8089"
+
+database:
+  dbuser: taskmuser
+  dbname: taskmdb
+  dbpassword: taskmpasswd
