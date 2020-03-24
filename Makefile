@@ -55,12 +55,12 @@ push-%:
 		GOOS=$(firstword $(subst -, ,$*)) 		\
 		GOARCH=$(lastword $(subst -, ,$*))		\
 
-all-build: $(addprefix build-, $(subst /,_, $(ALL_PLATFORMS)))
+all-build: $(addprefix build-, $(subst /,_, $(ALL_PLATFORMS))) \
 
-all-container: $(addprefix container-, $(subst /,_, $(ALL_PLATFORMS)))
+all-container: $(addprefix container-, $(subst /,_, $(ALL_PLATFORMS))) \
 
 
-build: bin/$(OS)_$(ARCH)/$(BIN)
+build: bin/$(OS)_$(ARCH)/$(BIN) \
 
 # Required directories for build/test
 BUILD_DIRS := bin/$(OS)_$(ARCH)				\

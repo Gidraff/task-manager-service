@@ -13,15 +13,8 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run :
-          name: Create Test Result folder
-          command: mkdir -p $TEST_RESULTS
-      - run:
-          name: print work dir
-          command: pwd
-      - run:
-          name: Make build
-          command: make build
+      - run: go test -v ./...
+
 
       - restore_cache:
           keys:
