@@ -30,7 +30,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatal("Sentry.Init: %s", err)
+		log.Fatalf("Sentry.Init: %s", err)
 	}
 
 	defer sentry.Flush(2 * time.Second)
