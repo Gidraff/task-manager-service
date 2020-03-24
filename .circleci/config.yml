@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.13
       - image: circleci/postgres:10.5-alpine
 
     working_directory: /go/src/github.com/Gidraff/task-manager-service
