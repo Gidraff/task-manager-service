@@ -1,7 +1,7 @@
 #### TaskMan
-##### The service allows user to divided work into small manageable tasks, providing CRUD operations over RESTful API.
+The service allows user to divided work into small manageable tasks, providing CRUD operations over RESTful API.
 
-###### Technologies used:
+##### Technologies used:
 
 * db/sql
 * Echo
@@ -9,15 +9,20 @@
 * go mod
 * logrus
 
-###### Prerequisite
+##### Prerequisite
 To setup, you wll first have to grab a copy of this project by cloning it into your local machine. After you've cloned the repo make sure you have the following installed: 
 
-Go version: `go1.13.7`
+- Go version: `go1.13.7`
+- Docker engine
+- Make
+- Postgresql
 
-Docker engine
-Make
+##### Create DB locally
+To create a db connection for testing purposes, make sure you've installed Postgres locally or you have an instance running on a server on the cloud. Create a secure DB (provide credentials). Now create tables on the DB you've just created by running
+your sql in the root directory script as follow: `psql postgres -h 127.0.0.1 -d <example_db_name> -f db.sql
+`
 
-###### Build and Test
+##### Build and Test
 
 Before starting the application, make sure everything is work by running: 
 
@@ -27,7 +32,7 @@ To compile the app Run ```make build```. This will generate `.go` and `bin` fold
 
 If the build is successful, run `make test` to check if the tests are passing. Otherwise reach out to me on twitter.
 
-###### Start the server
+##### Start the server
 
 To start the server from main.go, run `go run cmd/taskman/main` on your terminal from the root folder.
 
