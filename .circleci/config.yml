@@ -2,29 +2,20 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.13
       - image: circleci/postgres:10.5-alpine
 
-    working_directory: /go/src/github.com/CirceCI-Public/task-manager-service
+    working_directory: /go/src/github.com/Gidraff/task-manager-usecase
 
     environment:
       TEST_RESULTS: /tmp/test-results
 
     steps:
       - checkout
-      - run: mkdir -p $TEST_RESULTS
+      - setup_remote_docker
+      - run: go test -v ./...
+
 
       - restore_cache:
           keys:
             - v1-pkg-cache
-
-      - run:
-          name: Waiting for Postgres to be ready
-          command: |
-            for i in `seq 1 10`;
-            do
-              nc -z localhost 5432 && echo Success && exit 0
-              echo -n .
-              sleep 1
-            done
-            echo Failed waiting for Postgres && exit 1
