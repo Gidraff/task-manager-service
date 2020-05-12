@@ -7,9 +7,9 @@ import (
 // User model
 type User struct {
 	ID        int64     `json:"id"`
-	Username  string    `json:"username"`
-	Email     string    `json:"email"`
-	Password  string    `json:"password"`
+	Username  string    `json:"username" validate:"min=3,max=50,required"`
+	Email     string    `json:"email" validate:"email,required"`
+	Password  string    `json:"password" validate:"min=8,required"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

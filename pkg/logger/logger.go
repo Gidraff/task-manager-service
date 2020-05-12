@@ -7,7 +7,7 @@ import (
 
 const (
 	// PathToLog specify path to lpg to
-	PathToLog string = "Users/gidraffkamande/Projects/Private/go/src/github.com/Gidraff/task-manager-service/test.log"
+	PathToLog string = "Users/gidraffkamande/Projects/Private/go/src/github.com/Gidraff/task-manager-usecase/test.log"
 )
 
 func SetUpLogger() {

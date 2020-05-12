@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/Gidraff/task-manager-service/cmd/taskman/model"
+	"github.com/Gidraff/task-manager-service/model"
 	"github.com/stretchr/testify/assert"
 )
 

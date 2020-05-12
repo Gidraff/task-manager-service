@@ -7,8 +7,8 @@ package middlewares
 // 	"os"
 // 	"strings"
 //
-// 	"github.com/Gidraff/task-manager-service/cmd/httpd/domain"
-// 	"github.com/Gidraff/task-manager-service/cmd/httpd/httputil"
+// 	"github.com/Gidraff/task-manager-usecase/cmd/httpd/domain"
+// 	"github.com/Gidraff/task-manager-usecase/cmd/httpd/httputil"
 // 	jwt "github.com/dgrijalva/jwt-go"
 // )
 //

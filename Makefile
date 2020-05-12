@@ -1,5 +1,5 @@
 # This is adapted from https://github.com/thockin/go-build-template
-BIN := taskman
+BIN := api
 
 REGISTRY ?= gidraff
 

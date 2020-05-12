@@ -1,42 +1,36 @@
 package repository
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
+	"github.com/Gidraff/task-manager-service/auth"
 	"github.com/getsentry/sentry-go"
 	"github.com/lib/pq"
 	"log"
 	"time"
 
-	"github.com/Gidraff/task-manager-service/cmd/taskman/model"
+	"github.com/Gidraff/task-manager-service/model"
 )
-
-// UserRepository encapsulates the logic to access user from the data source
-type UserRepository interface {
-	Create(ctx context.Context, u *model.User) error
-	//GetByEmail(ctx context.Context, email string) (error *model.User)
-}
 
 type userRepo struct {
 	Conn *sql.DB
 }
 
 // NewUserRepo returns a new UserRepository interface
-func NewUserRepo(db *sql.DB) UserRepository {
+func NewUserRepo(db *sql.DB) auth.UserRepository {
 	return &userRepo{Conn: db}
 }
 
 // Create adds user to database
-func (ur *userRepo) Create(ctx context.Context, u *model.User) error {
+func (ur *userRepo) Create(u *model.User) error {
 	query := "INSERT INTO users (username,email,password,created_at) VALUES ($1,$2,$3,$4)"
-	stmt, err := ur.Conn.PrepareContext(ctx, query) // here context is used for the preparation of the statement
+	stmt, err := ur.Conn.Prepare(query) // here context is used for the preparation of the statement
 	if err != nil {
 		return err
 	}
 
-	res, err := stmt.ExecContext(
-		ctx, u.Username, u.Email, u.Password, time.Now())
+	res, err := stmt.Exec(
+		u.Username, u.Email, u.Password, time.Now())
 	if pgerr, ok := err.(*pq.Error); ok {
 		if pgerr.Code == "23505" {
 			fmt.Println("Before error===>")
@@ -61,8 +55,8 @@ func (ur *userRepo) Create(ctx context.Context, u *model.User) error {
 	return nil
 }
 
-func (ur *userRepo) fetch(ctx context.Context, query string, args ...interface{}) ([]*model.User, error) {
-	rows, err := ur.Conn.QueryContext(ctx, query, args)
+func (ur *userRepo) fetch(query string, args ...interface{}) ([]*model.User, error) {
+	rows, err := ur.Conn.Query(query, args)
 	if err != nil {
 		return nil, err
 	}
@@ -91,4 +85,19 @@ func (ur *userRepo) fetch(ctx context.Context, query string, args ...interface{}
 	}
 	return result, nil
 
+}
+
+func (ur *userRepo) GetByEmail(email string) (res *model.User, err error) {
+	query := `SELECT id, username, email FROM users WHERE id=$1`
+
+	list, err := ur.fetch(query, email)
+	if err != nil {
+		return
+	}
+	if len(list) > 0 {
+		res = list[0]
+	} else {
+		return res, err
+	}
+	return
 }

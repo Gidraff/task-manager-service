@@ -1,19 +1,29 @@
 module github.com/Gidraff/task-manager-service
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.4.0
-	github.com/getsentry/sentry-go v0.5.1
-	github.com/labstack/echo v3.3.10+incompatible
-	github.com/lib/pq v1.0.0
-	github.com/mattn/go-colorable v0.1.4 // indirect
-	github.com/mattn/go-isatty v0.0.11 // indirect
-	github.com/spf13/viper v1.6.2
-	github.com/stretchr/testify v1.4.0
-	github.com/valyala/fasttemplate v1.1.0 // indirect
-	golang.org/x/crypto v0.0.0-20191227163750-53104e6ec876 // indirect
-	golang.org/x/net v0.0.0-20191209160850-c0dbc17a3553 // indirect
-	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
-	golang.org/x/text v0.3.2 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.4.1
+	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/getsentry/sentry-go v0.6.1
+	github.com/go-errors/errors v1.0.2 // indirect
+	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
+	github.com/gorilla/mux v1.7.4
+	github.com/kr/text v0.2.0 // indirect
+	github.com/lib/pq v1.5.2
+	github.com/mitchellh/mapstructure v1.3.0 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
+	github.com/pelletier/go-toml v1.7.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/smartystreets/assertions v1.1.0 // indirect
+	github.com/spf13/afero v1.2.2 // indirect
+	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/viper v1.7.0
+	github.com/stretchr/testify v1.5.1
+	github.com/urfave/negroni v1.0.0
+	golang.org/x/sys v0.0.0-20200511232937-7e40ca221e25 // indirect
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
+	gopkg.in/ini.v1 v1.56.0 // indirect
 )
 
 go 1.13

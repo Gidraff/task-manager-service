@@ -3,15 +3,17 @@ package main
 import (
 	"database/sql"
 	"github.com/getsentry/sentry-go"
+	"github.com/gorilla/mux"
+	"github.com/urfave/negroni"
 	"log"
+	"net/http"
 	"time"
 
-	"github.com/Gidraff/task-manager-service/cmd/taskman/config"
-	_userHttpDeliver "github.com/Gidraff/task-manager-service/cmd/taskman/delivery/http"
+	_userHttpDeliver "github.com/Gidraff/task-manager-service/auth/delivery/http"
+	"github.com/Gidraff/task-manager-service/config"
 
-	_userRepo "github.com/Gidraff/task-manager-service/cmd/taskman/repository"
-	_userService "github.com/Gidraff/task-manager-service/cmd/taskman/service"
-	"github.com/labstack/echo"
+	_userRepo "github.com/Gidraff/task-manager-service/auth/repository"
+	_userService "github.com/Gidraff/task-manager-service/auth/usecase"
 
 	// _ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/lib/pq"
@@ -19,7 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	// "github.com/Gidraff/go-interfaces/cmd/taskman/config"
+	// "github.com/Gidraff/go-interfaces/cmd/api/config"
 )
 
 func main() {
@@ -54,10 +56,15 @@ func main() {
 	defer dbConn.Close()
 
 	// Initialize router
-	e := echo.New()
+	router := mux.NewRouter()
+	n := negroni.New()
+	n.Use(negroni.NewLogger())
+	n.UseHandler(router)
+
 	userRepo := _userRepo.NewUserRepo(dbConn)
 	uService := _userService.NewService(userRepo)
-	_userHttpDeliver.NewUserHandler(e, uService)
-	log.Fatal(e.Start(cfg.GetString("port")))
+	_userHttpDeliver.NewUserHandler(router, uService)
 
+	fmt.Println("Server starting...")
+	http.ListenAndServe(cfg.GetString("port"), n)
 }

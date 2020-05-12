@@ -51,3 +51,39 @@ func MustParams(h http.Handler, params ...string) http.Handler {
 		h.ServeHTTP(w, r) // all params present, proceed
 	})
 }
+
+func SuccessResponse(fields map[string]interface{}, w http.ResponseWriter) {
+	fields["status"] = "success"
+	message, err := json.Marshal(fields)
+
+	if err != nil {
+		// An error occurred processing the json
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("An error occurred internally"))
+	}
+
+	// Send header, status code and output to writer
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(message)
+}
+
+func ErrorResponse(statusCode int, error string, w http.ResponseWriter) {
+	// Create a new map and fill it
+	fields := make(map[string]interface{})
+	fields["status"] = "error"
+	fields["message"] = error
+	message, err := json.Marshal(fields)
+
+	if err != nil {
+		// An error occurred processing the json
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("An error occurred internally"))
+	}
+
+	// Send header, status code and output to writer
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(message)
+
+}
