@@ -6,19 +6,18 @@ import (
 	"log"
 )
 
-// Service encapsulates user usecase
-
+// S encapsulates user usecase
 type AuthUseCase struct {
-	userRepo auth.UserRepository
+	authRepo auth.BasicAuthRepository
 }
 
 // NewService creates a new user usecase
-func NewService(userRepo auth.UserRepository) *AuthUseCase {
-	return &AuthUseCase{userRepo}
+func NewAuthUseCase(authRepo auth.BasicAuthRepository) *AuthUseCase {
+	return &AuthUseCase{authRepo}
 }
 
-func (auth *AuthUseCase) Register(userData *model.User) (err error) {
-	err = auth.userRepo.Create(userData)
+func (auth *AuthUseCase) SignUp(userData *model.User) (err error) {
+	err = auth.authRepo.CreateUser(userData)
 	if err != nil {
 		log.Printf("usecase %s", err)
 		return
@@ -28,7 +27,7 @@ func (auth *AuthUseCase) Register(userData *model.User) (err error) {
 }
 
 func (auth *AuthUseCase) FetchUserByEmail(email string) (res *model.User, err error) {
-	res, err = auth.userRepo.GetByEmail(email)
+	res, err = auth.authRepo.GetUserByEmail(email)
 	if err != nil {
 		return &model.User{}, err
 	}

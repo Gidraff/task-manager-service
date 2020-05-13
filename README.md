@@ -19,7 +19,7 @@ To setup, you wll first have to grab a copy of this project by cloning it into y
 
 ##### Create DB locally
 To create a db connection for testing purposes, make sure you've installed Postgres locally or you have an instance running on a server on the cloud. Create a secure DB (provide credentials). Now create tables on the DB you've just created by running
-your sql in the root directory script as follow: `psql postgres -h 127.0.0.1 -d <example_db_name> -f db.sql
+your sql in the root directory script as follow: `psql postgres -h 127.0.0.1 -d <example_db_name> -f schema.sql
 `
 
 ##### Build and Test

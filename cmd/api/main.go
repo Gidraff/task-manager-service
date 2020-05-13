@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"github.com/Gidraff/task-manager-service/auth/repository/postgres"
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -9,23 +10,19 @@ import (
 	"net/http"
 	"time"
 
-	_userHttpDeliver "github.com/Gidraff/task-manager-service/auth/delivery/http"
+	_authHttpDeliver "github.com/Gidraff/task-manager-service/auth/delivery/http"
 	"github.com/Gidraff/task-manager-service/config"
 
-	_userRepo "github.com/Gidraff/task-manager-service/auth/repository"
-	_userService "github.com/Gidraff/task-manager-service/auth/usecase"
+	_authUseCase "github.com/Gidraff/task-manager-service/auth/usecase"
 
-	// _ "github.com/jinzhu/gorm/dialects/postgres"
 	_ "github.com/lib/pq"
 
 	"fmt"
 	"os"
 	"path/filepath"
-	// "github.com/Gidraff/go-interfaces/cmd/api/config"
 )
 
 func main() {
-
 	err := sentry.Init(sentry.ClientOptions{
 		Dsn:   "http://220e0359f4dc4ff090bbf5ea7f4cb644@sentry.io/4438912",
 		Debug: true,
@@ -61,9 +58,9 @@ func main() {
 	n.Use(negroni.NewLogger())
 	n.UseHandler(router)
 
-	userRepo := _userRepo.NewUserRepo(dbConn)
-	uService := _userService.NewService(userRepo)
-	_userHttpDeliver.NewUserHandler(router, uService)
+	authRepo := postgres.NewAuthRepo(dbConn)
+	authUseCase := _authUseCase.NewAuthUseCase(authRepo)
+	_authHttpDeliver.NewAuthHandler(router, authUseCase)
 
 	fmt.Println("Server starting...")
 	http.ListenAndServe(cfg.GetString("port"), n)

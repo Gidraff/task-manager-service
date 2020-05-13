@@ -11,7 +11,7 @@ VERSION := $(shell git describe --tags --always --dirty)
 ###
 
 
-SRC_DIRS := cmd pkg # Dirs which hold app source
+SRC_DIRS := auth pkg/utils # Dirs which hold app source
 
 ALL_PLATFORMS := linux/amd64
 
@@ -162,7 +162,7 @@ test: $(BUILD_DIRS)
 			-v $$(pwd)/.go/bin/$(OS)_$(ARCH):/go/bin/$(OS)_$(ARCH) 	\
 			-v $$(pwd)/.go/cache:/.cache 				\
 			-v $$(pwd)/config:/config 					\
-			-v $$(pwd)/cmd/taskman/test_data:/test_data	\
+			-v $$(pwd)/cmd/api/test_data:/test_data	\
 			--env HTTP_PROXY=$(HTTP_PROXY) 				\
 			--env HTTPS_PROXY=$(HTTPS_PROXY) 			\
 			--env TASKMAN_API_KEY=DUMMY 				\

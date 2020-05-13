@@ -2,6 +2,6 @@ package usecase
 
 import "testing"
 
-func TestRegister(t *testing.T) {
+func TestAuthUseCase_SignUp(t *testing.T) {
 
 }

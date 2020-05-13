@@ -12,11 +12,11 @@ import (
 
 // UserHandler represent httphandler for user
 type AuthHandler struct {
-	useCase auth.UseCase
+	basicAuth auth.BasicAuthUseCase
 }
 
 // NewUserHandler will initialize user resources endpoint
-func NewUserHandler(router *mux.Router, uc auth.UseCase) {
+func NewAuthHandler(router *mux.Router, uc auth.BasicAuthUseCase) {
 	authHandler := &AuthHandler{uc}
 
 	router.HandleFunc("/api/v1/auth/signup", authHandler.Signup)
@@ -27,12 +27,13 @@ func (ah AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input model.User
 	err := decoder.Decode(&input)
-	if err != nil {
 
+	if err != nil {
 		utils.Respond(w, utils.Message(false, "Invalid request"))
 		return
 	}
-	err = ah.useCase.Register(&input)
+
+	err = ah.basicAuth.SignUp(&input)
 	if err != nil {
 		utils.ErrorResponse(http.StatusInternalServerError, "duplicate", w)
 		return

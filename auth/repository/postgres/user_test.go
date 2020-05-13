@@ -1,7 +1,6 @@
-package repository
+package postgres
 
 import (
-	"context"
 	"database/sql/driver"
 	"log"
 	"regexp"
@@ -21,7 +20,7 @@ func (a AnyTime) Match(v driver.Value) bool { // implements Argument interface
 	return ok
 }
 
-func TestStore(t *testing.T) {
+func TestAuthRepo_CreateUser(t *testing.T) {
 	u := &model.User{
 		Username: "johndoe",
 		Email:    "johndoe@gmail.com",
@@ -40,10 +39,9 @@ func TestStore(t *testing.T) {
 		WithArgs(u.Username, u.Email, u.Password, AnyTime{}).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	ctx := context.Background()
 	// Behaviour to be tested
-	userRepo := NewUserRepo(db)
-	err = userRepo.Create(ctx, u)
+	authRepo := NewAuthRepo(db)
+	err = authRepo.CreateUser(u)
 
 	assert.NoError(t, err)
 

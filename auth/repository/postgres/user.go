@@ -1,4 +1,4 @@
-package repository
+package postgres
 
 import (
 	"database/sql"
@@ -12,17 +12,17 @@ import (
 	"github.com/Gidraff/task-manager-service/model"
 )
 
-type userRepo struct {
+type authRepo struct {
 	Conn *sql.DB
 }
 
 // NewUserRepo returns a new UserRepository interface
-func NewUserRepo(db *sql.DB) auth.UserRepository {
-	return &userRepo{Conn: db}
+func NewAuthRepo(db *sql.DB) auth.BasicAuthRepository {
+	return &authRepo{Conn: db}
 }
 
 // Create adds user to database
-func (ur *userRepo) Create(u *model.User) error {
+func (ur *authRepo) CreateUser(u *model.User) error {
 	query := "INSERT INTO users (username,email,password,created_at) VALUES ($1,$2,$3,$4)"
 	stmt, err := ur.Conn.Prepare(query) // here context is used for the preparation of the statement
 	if err != nil {
@@ -55,7 +55,7 @@ func (ur *userRepo) Create(u *model.User) error {
 	return nil
 }
 
-func (ur *userRepo) fetch(query string, args ...interface{}) ([]*model.User, error) {
+func (ur *authRepo) fetch(query string, args ...interface{}) ([]*model.User, error) {
 	rows, err := ur.Conn.Query(query, args)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (ur *userRepo) fetch(query string, args ...interface{}) ([]*model.User, err
 
 }
 
-func (ur *userRepo) GetByEmail(email string) (res *model.User, err error) {
+func (ur *authRepo) GetUserByEmail(email string) (res *model.User, err error) {
 	query := `SELECT id, username, email FROM users WHERE id=$1`
 
 	list, err := ur.fetch(query, email)
