@@ -6,5 +6,5 @@ import (
 
 type BasicAuthUseCase interface {
 	SignUp(userData *model.User) error
-	FetchUserByEmail(email string) (res *model.User, err error)
+	//FetchUserByEmail(email string) (res *model.User, err error)
 }

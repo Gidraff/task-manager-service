@@ -4,26 +4,23 @@ import (
 	"encoding/json"
 	"github.com/Gidraff/task-manager-service/auth"
 	"github.com/Gidraff/task-manager-service/pkg/utils"
-	"github.com/gorilla/mux"
 	"net/http"
 
 	"github.com/Gidraff/task-manager-service/model"
 )
 
-// UserHandler represent httphandler for user
+// AuthHandler represent http handler for user
 type AuthHandler struct {
 	basicAuth auth.BasicAuthUseCase
 }
 
 // NewUserHandler will initialize user resources endpoint
-func NewAuthHandler(router *mux.Router, uc auth.BasicAuthUseCase) {
-	authHandler := &AuthHandler{uc}
-
-	router.HandleFunc("/api/v1/auth/signup", authHandler.Signup)
+func NewAuthHandler(uc auth.BasicAuthUseCase) *AuthHandler {
+	return &AuthHandler{uc}
 }
 
-// Signup will sign up the user by given req body
-func (ah AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
+// SignUp handler registers a new user
+func (ah AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var input model.User
 	err := decoder.Decode(&input)

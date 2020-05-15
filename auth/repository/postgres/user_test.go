@@ -20,9 +20,9 @@ func (a AnyTime) Match(v driver.Value) bool { // implements Argument interface
 	return ok
 }
 
-func TestAuthRepo_CreateUser(t *testing.T) {
+func TestUserRepo_CreateUser(t *testing.T) {
 	u := &model.User{
-		Username: "johndoe",
+		Username: "john",
 		Email:    "johndoe@gmail.com",
 		Password: "1234qwerty",
 	}
@@ -40,8 +40,8 @@ func TestAuthRepo_CreateUser(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	// Behaviour to be tested
-	authRepo := NewAuthRepo(db)
-	err = authRepo.CreateUser(u)
+	userRepo := NewUserRepo(db)
+	err = userRepo.CreateUser(u)
 
 	assert.NoError(t, err)
 

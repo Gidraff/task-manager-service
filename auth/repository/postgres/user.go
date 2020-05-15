@@ -2,51 +2,40 @@ package postgres
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/Gidraff/task-manager-service/auth"
-	"github.com/getsentry/sentry-go"
-	"github.com/lib/pq"
 	"log"
 	"time"
 
 	"github.com/Gidraff/task-manager-service/model"
 )
 
-type authRepo struct {
-	Conn *sql.DB
+type userRepo struct {
+	Db *sql.DB
 }
 
-// NewUserRepo returns a new UserRepository interface
-func NewAuthRepo(db *sql.DB) auth.BasicAuthRepository {
-	return &authRepo{Conn: db}
+// NewAuthRepo returns a new UserRepository interface
+func NewUserRepo(db *sql.DB) auth.UserRepository {
+	return &userRepo{Db: db}
 }
 
-// Create adds user to database
-func (ur *authRepo) CreateUser(u *model.User) error {
+// CreateUser persists a new user to db
+func (ur *userRepo) CreateUser(u *model.User) error {
 	query := "INSERT INTO users (username,email,password,created_at) VALUES ($1,$2,$3,$4)"
-	stmt, err := ur.Conn.Prepare(query) // here context is used for the preparation of the statement
+	stmt, err := ur.Db.Prepare(query) // here context is used for the preparation of the statement
 	if err != nil {
 		return err
 	}
 
 	res, err := stmt.Exec(
 		u.Username, u.Email, u.Password, time.Now())
-	if pgerr, ok := err.(*pq.Error); ok {
-		if pgerr.Code == "23505" {
-			fmt.Println("Before error===>")
-			sentry.CaptureException(err)
-			log.Printf("Failed with %s", err)
-			return err.(*pq.Error)
-		}
-	}
+
 	if err != nil {
-		sentry.CaptureException(err)
-		log.Println(err)
+		return err
 	}
 
 	rows, err := res.RowsAffected()
 	if err != nil {
-		log.Println(err)
+		return err
 	}
 	if rows != 1 {
 		log.Fatalf("Expected to affect 1 row, affected %d", rows)
@@ -55,8 +44,9 @@ func (ur *authRepo) CreateUser(u *model.User) error {
 	return nil
 }
 
-func (ur *authRepo) fetch(query string, args ...interface{}) ([]*model.User, error) {
-	rows, err := ur.Conn.Query(query, args)
+// fetch returns a list of users or error
+func (ur *userRepo) fetch(query string, args ...interface{}) ([]*model.User, error) {
+	rows, err := ur.Db.Query(query, args)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +77,8 @@ func (ur *authRepo) fetch(query string, args ...interface{}) ([]*model.User, err
 
 }
 
-func (ur *authRepo) GetUserByEmail(email string) (res *model.User, err error) {
+// GetUserByEmail returns a user with the provided email
+func (ur *userRepo) GetUserByEmail(email string) (res *model.User, err error) {
 	query := `SELECT id, username, email FROM users WHERE id=$1`
 
 	list, err := ur.fetch(query, email)

@@ -3,33 +3,31 @@ package usecase
 import (
 	"github.com/Gidraff/task-manager-service/auth"
 	"github.com/Gidraff/task-manager-service/model"
-	"log"
 )
 
 // S encapsulates user usecase
-type AuthUseCase struct {
-	authRepo auth.BasicAuthRepository
+type UseCase struct {
+	userAuthRepo auth.UserRepository
 }
 
 // NewService creates a new user usecase
-func NewAuthUseCase(authRepo auth.BasicAuthRepository) *AuthUseCase {
-	return &AuthUseCase{authRepo}
+func NewUseCase(userAuthRepo auth.UserRepository) *UseCase {
+	return &UseCase{userAuthRepo}
 }
 
-func (auth *AuthUseCase) SignUp(userData *model.User) (err error) {
-	err = auth.authRepo.CreateUser(userData)
+func (authUC *UseCase) SignUp(user *model.User) (err error) {
+	err = authUC.userAuthRepo.CreateUser(user)
 	if err != nil {
-		log.Printf("usecase %s", err)
 		return
 	}
 
 	return nil
 }
 
-func (auth *AuthUseCase) FetchUserByEmail(email string) (res *model.User, err error) {
-	res, err = auth.authRepo.GetUserByEmail(email)
-	if err != nil {
-		return &model.User{}, err
-	}
-	return
-}
+//func (auth *AuthUseCase) FetchUserByEmail(email string) (res *model.User, err error) {
+//	res, err = auth.authRepo.GetUserByEmail(email)
+//	if err != nil {
+//		return &model.User{}, err
+//	}
+//	return
+//}
