@@ -4,8 +4,8 @@ import (
 	"github.com/Gidraff/task-manager-service/auth/repository/mock"
 	"github.com/Gidraff/task-manager-service/model"
 	"github.com/stretchr/testify/assert"
+	mc "github.com/stretchr/testify/mock"
 	"testing"
-	"time"
 )
 
 func TestUseCase_SignUp(t *testing.T) {
@@ -18,18 +18,13 @@ func TestUseCase_SignUp(t *testing.T) {
 		password = "qw123d4rdt45kfj2gw4rt"
 
 		user = &model.User{
-			ID:        0,
 			Username:  username,
 			Email:     email,
 			Password:  password,
-			CreatedAt: time.Time{},
 		}
 	)
 
-	repo.On("CreateUser", user).Return(nil)
+	repo.On("Store", mc.AnythingOfType("*model.User")).Return(nil)
 	err := uc.SignUp(user)
 	assert.NoError(t, err)
-
-	repo.On("CreateUser", user).Return()
-
 }

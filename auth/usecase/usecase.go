@@ -5,7 +5,7 @@ import (
 	"github.com/Gidraff/task-manager-service/model"
 )
 
-// S encapsulates user usecase
+// encapsulates user usecase
 type UseCase struct {
 	userAuthRepo auth.UserRepository
 }
@@ -15,19 +15,21 @@ func NewUseCase(userAuthRepo auth.UserRepository) *UseCase {
 	return &UseCase{userAuthRepo}
 }
 
-func (authUC *UseCase) SignUp(user *model.User) (err error) {
-	err = authUC.userAuthRepo.CreateUser(user)
+func (authUC *UseCase) SignUp(user *model.User) error {
+	//authUC.logger.Info("Registering user")
+	err := authUC.userAuthRepo.Store(user)
 	if err != nil {
-		return
+		return err
 	}
-
 	return nil
 }
 
-//func (auth *AuthUseCase) FetchUserByEmail(email string) (res *model.User, err error) {
-//	res, err = auth.authRepo.GetUserByEmail(email)
-//	if err != nil {
-//		return &model.User{}, err
-//	}
-//	return
-//}
+func (authUC *UseCase) GetUserByEmail(email string) (*model.User, error) {
+	//authUC.logger.Info("Get User by email")
+	user, err := authUC.userAuthRepo.FetchByEmail(email)
+	if err != nil {
+		//authUC.logger.Error("Could not find user with email")
+		return nil, err
+	}
+	return user, nil
+}

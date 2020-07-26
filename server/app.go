@@ -2,16 +2,19 @@ package server
 
 import (
 	"context"
-	"database/sql"
+	log "github.com/sirupsen/logrus"
+
+	//"database/sql"
 	"fmt"
 	"github.com/Gidraff/task-manager-service/auth"
 	authhttp "github.com/Gidraff/task-manager-service/auth/delivery/http"
 	authpostgres "github.com/Gidraff/task-manager-service/auth/repository/postgres"
 	authusecase "github.com/Gidraff/task-manager-service/auth/usecase"
+	lg "github.com/Gidraff/task-manager-service/pkg/utils/logger"
 	"github.com/gorilla/mux"
-	"github.com/spf13/viper"
+	_ "github.com/hpcloud/tail/util"
+	"github.com/jinzhu/gorm"
 	"github.com/urfave/negroni"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,19 +24,16 @@ import (
 // App encapsulate application' server
 type App struct {
 	httpServer *http.Server
-	authUC     auth.BasicAuthUseCase
+	authUC     auth.UseCase
+	logger     *lg.Logger
 }
 
 // NewApp return a instance of app
-func NewApp(cfg *viper.Viper) *App {
-	db := initDB(cfg)
-	defer db.Close()
-
+func NewApp(db *gorm.DB, logger *lg.Logger) *App {
 	userAuthRepo := authpostgres.NewUserRepo(db)
 	return &App{
 		authUC: authusecase.NewUseCase(userAuthRepo),
 	}
-
 }
 
 // Run bootstraps the app's server
@@ -58,6 +58,7 @@ func (a *App) Run(port string) error {
 		fmt.Println("Server starting...")
 		if err := a.httpServer.ListenAndServe(); err != nil {
 			log.Fatalf("Failed to listen and server: %+v", err)
+			return
 		}
 	}()
 
@@ -70,20 +71,4 @@ func (a *App) Run(port string) error {
 	defer shutdown()
 
 	return a.httpServer.Shutdown(ctx)
-}
-
-// initDB return a db connection
-func initDB(vc *viper.Viper) *sql.DB {
-	connStr := fmt.Sprintf(
-		vc.GetString("dsn"),
-		vc.GetString("database.dbuser"),
-		vc.GetString("database.dbpassword"),
-		vc.GetString("database.dbname"),
-	)
-
-	dbConn, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatalf("An error occured while trying to connect %+v", err)
-	}
-	return dbConn
 }

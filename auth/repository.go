@@ -6,6 +6,6 @@ import (
 
 // UserRepository encapsulates the logic to access user from the data source
 type UserRepository interface {
-	CreateUser(u *model.User) error
-	//GetUserByEmail(email string) (res *model.User, err error)
+	Store(u *model.User)  error
+	FetchByEmail(email string) (*model.User, error)
 }

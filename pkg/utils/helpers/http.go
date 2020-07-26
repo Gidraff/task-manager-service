@@ -1,4 +1,4 @@
-package utils
+package helpers
 
 import (
 	"encoding/json"
@@ -10,12 +10,6 @@ func Message(status bool, message string) map[string]interface{} {
 	return map[string]interface{}{"status": status, "message": message}
 }
 
-// Respond returns a json response
-func Respond(w http.ResponseWriter, data map[string]interface{}) {
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(data)
-}
-
 // SuccessResponse returns Status ok json
 func SuccessResponse(fields map[string]interface{}, w http.ResponseWriter) {
 	fields["status"] = "success"
@@ -23,11 +17,11 @@ func SuccessResponse(fields map[string]interface{}, w http.ResponseWriter) {
 	if err != nil {
 		// An error occurred processing the json
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("An error occurred internally"))
+		w.Write([]byte("An error in processing json"))
 	}
 	// Send header, status code and output to writer
+	w.WriteHeader(201)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 	w.Write(message)
 }
 
@@ -35,7 +29,7 @@ func SuccessResponse(fields map[string]interface{}, w http.ResponseWriter) {
 func ErrorResponse(statusCode int, error string, w http.ResponseWriter) {
 	// Create a new map and fill it
 	fields := make(map[string]interface{})
-	fields["status"] = "error"
+	fields["status"] = false
 	fields["message"] = error
 	message, err := json.Marshal(fields)
 
@@ -48,5 +42,4 @@ func ErrorResponse(statusCode int, error string, w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(message)
-
 }

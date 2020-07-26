@@ -2,8 +2,11 @@ package postgres
 
 import (
 	"database/sql/driver"
-	"log"
 	"regexp"
+
+	//"errors"
+	"github.com/jinzhu/gorm"
+	"log"
 	"testing"
 	"time"
 
@@ -20,7 +23,7 @@ func (a AnyTime) Match(v driver.Value) bool { // implements Argument interface
 	return ok
 }
 
-func TestUserRepo_CreateUser(t *testing.T) {
+func TestUserRepo_Store(t *testing.T) {
 	u := &model.User{
 		Username: "john",
 		Email:    "johndoe@gmail.com",
@@ -28,21 +31,24 @@ func TestUserRepo_CreateUser(t *testing.T) {
 	}
 
 	db, mock, err := sqlmock.New()
+	gdb, err := gorm.Open("postgres", db)
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 
 	defer db.Close()
-
-	mock.ExpectPrepare(regexp.QuoteMeta("INSERT INTO users")).
-		ExpectExec().
-		WithArgs(u.Username, u.Email, u.Password, AnyTime{}).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	const sqlInsert = `INSERT INTO "users" ("created_at","updated_at","deleted_at","username","email","password","status") VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING "users"."id"`
+	const newId = 1
+	mock.ExpectBegin()
+	mock.ExpectQuery(regexp.QuoteMeta(sqlInsert)).
+		WithArgs(AnyTime{}, AnyTime{}, AnyTime{}, u.Username, u.Email, u.Password, false).
+		WillReturnRows(
+			sqlmock.NewRows([]string{"id"}).AddRow(newId))
+	mock.ExpectCommit() // commit transaction
 
 	// Behaviour to be tested
-	userRepo := NewUserRepo(db)
-	err = userRepo.CreateUser(u)
-
+	userRepo := NewUserRepo(gdb)
+	err = userRepo.Store(u)
 	assert.NoError(t, err)
 
 	if err := mock.ExpectationsWereMet(); err != nil {

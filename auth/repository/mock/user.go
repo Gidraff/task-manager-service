@@ -9,10 +9,14 @@ type UserRepoMock struct {
 	mock.Mock
 }
 
-// CreateUser provides a mock function with given fields: userData
-func (m *UserRepoMock) CreateUser(userData *model.User) error {
-	ret := m.Called(userData)
+func (m *UserRepoMock) FetchByEmail(email string) (user *model.User, err error) {
+	ret := m.Called(email)
+	return &model.User{}, ret.Error(0)
+}
 
+// CreateUser provides a mock function with given fields: userData
+func (m *UserRepoMock) Store(userData *model.User) error {
+	ret := m.Called(userData)
 	var r0 error
 	if rf, ok := ret.Get(0).(func(user *model.User) error); ok {
 		r0 = rf(userData)
