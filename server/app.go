@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	log "github.com/sirupsen/logrus"
 
 	//"database/sql"
@@ -13,7 +14,6 @@ import (
 	lg "github.com/Gidraff/task-manager-service/pkg/utils/logger"
 	"github.com/gorilla/mux"
 	_ "github.com/hpcloud/tail/util"
-	"github.com/jinzhu/gorm"
 	"github.com/urfave/negroni"
 	"net/http"
 	"os"
@@ -29,7 +29,7 @@ type App struct {
 }
 
 // NewApp return a instance of app
-func NewApp(db *gorm.DB, logger *lg.Logger) *App {
+func NewApp(db *sql.DB, logger *lg.Logger) *App {
 	userAuthRepo := authpostgres.NewUserRepo(db)
 	return &App{
 		authUC: authusecase.NewUseCase(userAuthRepo),

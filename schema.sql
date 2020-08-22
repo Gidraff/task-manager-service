@@ -1,13 +1,15 @@
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS accounts;
 
 
-CREATE TABLE users (
-  id serial primary key,
-  username varchar(255) not null,
-  email varchar(255) not null unique,
+CREATE TABLE accounts (
+  user_id serial primary key,
+  username varchar(50) not null,
+  email varchar(50) unique not null,
+  active boolean not null,
   password varchar(255) not null,
-  created_at timestamp not null
+  created_on timestamp not null,
+  last_login timestamp
 );
 
-GRANT USAGE, SELECT ON SEQUENCE users_id_seq TO taskmuser;
-GRANT ALL PRIVILEGES ON TABLE users TO taskmuser;
+GRANT USAGE, SELECT ON SEQUENCE accounts_user_id_seq TO taskmuser;
+GRANT ALL PRIVILEGES ON TABLE accounts TO taskmuser;

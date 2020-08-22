@@ -4,12 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/Gidraff/task-manager-service/auth"
-	"github.com/Gidraff/task-manager-service/model"
 	"github.com/Gidraff/task-manager-service/pkg/utils/helpers"
+	"log"
 	"net/http"
 )
 
 // AuthHandler represent http handler for user
+type JsonInput struct {
+	Username string
+	Email    string
+	Password string
+}
+
 type AuthHandler struct {
 	authUC auth.UseCase
 }
@@ -21,12 +27,11 @@ func NewAuthHandler(uc auth.UseCase) *AuthHandler {
 
 // SignUp handler registers a new user
 func (ah AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
-	var user model.User
+	var user JsonInput
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	defer r.Body.Close()
-
-	if  err := decoder.Decode(&user); err != nil {
+	if err := decoder.Decode(&user); err != nil {
 		var syntaxError *json.SyntaxError
 		switch {
 		case errors.As(err, &syntaxError):
@@ -42,17 +47,13 @@ func (ah AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		helpers.ErrorResponse(400, message, w)
 		return
 	}
-
-	duplicateUser, err := ah.authUC.GetUserByEmail(user.Email)
-	if  duplicateUser != nil {
-		message := "User with that email already exist."
-		helpers.ErrorResponse(http.StatusBadRequest, message, w)
-		return
-	}
-
-	err = ah.authUC.SignUp(&user)
+	hashPassword, err := helpers.HashPassword(user.Password)
 	if err != nil {
-		helpers.ErrorResponse(http.StatusInternalServerError, "duplicate", w)
+		log.Printf("Failed to hash password %s", err)
+	}
+	err = ah.authUC.RegisterAccount(user.Username, user.Email, hashPassword)
+	if err != nil {
+		helpers.ErrorResponse(409, "Sign up failed. Email should be unique.", w)
 		return
 	}
 	helpers.SuccessResponse(helpers.Message(true, "Successfully registered"), w)

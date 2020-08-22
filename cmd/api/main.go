@@ -1,12 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/Gidraff/task-manager-service/config"
-	"github.com/Gidraff/task-manager-service/model"
 	"github.com/Gidraff/task-manager-service/pkg/utils/logger"
 	"github.com/Gidraff/task-manager-service/server"
-	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"log"
 	"os"
@@ -29,13 +28,12 @@ func main() {
 	)
 
 	// Open db connection
-	db, err := gorm.Open("postgres", connStr)
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatalf("DB: Error while establishing connection %+v", err)
 	}
 
 	defer db.Close()
-	model.DBMigrate(db)
 
 	// Run app
 	logger := logger.NewLogger("info")

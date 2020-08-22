@@ -5,6 +5,6 @@ import (
 )
 
 type UseCase interface {
-	SignUp(u *model.User)  error
-	GetUserByEmail(email string) (*model.User, error)
+	RegisterAccount(username, email, password string) error
+	GetAccountByEmail(email string) (*model.Account, error)
 }

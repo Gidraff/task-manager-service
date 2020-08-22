@@ -15,20 +15,17 @@ func NewUseCase(userAuthRepo auth.UserRepository) *UseCase {
 	return &UseCase{userAuthRepo}
 }
 
-func (authUC *UseCase) SignUp(user *model.User) error {
-	//authUC.logger.Info("Registering user")
-	err := authUC.userAuthRepo.Store(user)
+func (authUC *UseCase) RegisterAccount(username, email, password string) error {
+	err := authUC.userAuthRepo.Store(username, email, password)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (authUC *UseCase) GetUserByEmail(email string) (*model.User, error) {
-	//authUC.logger.Info("Get User by email")
+func (authUC *UseCase) GetAccountByEmail(email string) (*model.Account, error) {
 	user, err := authUC.userAuthRepo.FetchByEmail(email)
 	if err != nil {
-		//authUC.logger.Error("Could not find user with email")
 		return nil, err
 	}
 	return user, nil

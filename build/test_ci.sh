@@ -29,7 +29,7 @@ echo
 # Collect all `.go` files and `gofmt` against them. If some need formatting - print them.
 echo -n "Checking gofmt: "
 ERRS=$(find "$@" -type f -name \*.go | xargs gofmt -l 2>&1 || true)
-if [ -n "${ERRS}" ]; then
+if [[ -n "${ERRS}" ]]; then
     echo "FAIL - the following files need to be gofmt'ed:"
     for e in ${ERRS}; do
         echo "    $e"
@@ -43,7 +43,7 @@ echo
 # Run `go vet` against all targets. If problems are found - print them.
 echo -n "Checking go vet: "
 ERRS=$(go vet ${TARGETS} 2>&1 | tee "/reports/vet.out" || true)
-if [ -n "${ERRS}" ]; then
+if [[ -n "${ERRS}" ]]; then
     echo "FAIL"
     echo "${ERRS}"
     echo

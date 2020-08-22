@@ -5,15 +5,15 @@ set -o nounset
 set -o pipefail
 
 # Check if OS, architecture and application version variables are set in Makefile
-if [ -z "${OS:-}" ]; then
+if [[ -z "${OS:-}" ]]; then
     echo "OS must be set"
     exit 1
 fi
-if [ -z "${ARCH:-}" ]; then
+if [[ -z "${ARCH:-}" ]]; then
     echo "ARCH must be set"
     exit 1
 fi
-if [ -z "${VERSION:-}" ]; then
+if [[ -z "${VERSION:-}" ]]; then
     echo "VERSION must be set"
     exit 1
 fi

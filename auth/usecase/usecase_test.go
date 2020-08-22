@@ -17,14 +17,15 @@ func TestUseCase_SignUp(t *testing.T) {
 		email    = "johndoe@gmail.com"
 		password = "qw123d4rdt45kfj2gw4rt"
 
-		user = &model.User{
-			Username:  username,
-			Email:     email,
-			Password:  password,
+		user = &model.Account{
+			Username: username,
+			Email:    email,
+			Password: password,
 		}
 	)
 
-	repo.On("Store", mc.AnythingOfType("*model.User")).Return(nil)
-	err := uc.SignUp(user)
+	repo.On("Store", mc.Anything, mc.Anything, mc.Anything).Return(nil)
+	err := uc.RegisterAccount(user.Username, email, user.Password)
 	assert.NoError(t, err)
+	repo.AssertExpectations(t)
 }

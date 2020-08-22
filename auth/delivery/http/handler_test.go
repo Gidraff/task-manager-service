@@ -15,30 +15,30 @@ func TestAuthHandler_SignUp(t *testing.T) {
 	// Given this
 	type userData struct {
 		username string
-		email string
+		email    string
 		password string
 	}
 
 	type test struct {
-		name string
-		input string
+		name     string
+		input    string
 		expected string
-		code int
+		code     int
 	}
 
-	tt := [] test {
+	tt := []test{
 
-		 {
-		 	name: "test valid json input",
-			input:  `{"username":"janedoe", "email": "jane@mail.com", "password":"1234qwert"}`,
+		{
+			name:     "test valid json input",
+			input:    `{"username":"janedoe", "email": "jane@mail.com", "password":"1234qwert"}`,
 			expected: `{"message":"Successfully registered","status":"success"}`,
-			code: 201,
+			code:     201,
 		},
 		{
-			name: "test invalid user email",
-			input:  `{"username":"janedoe", "email": "janemail.com", "password":"1234qwert"}`,
+			name:     "test invalid user email",
+			input:    `{"username":"janedoe", "email": "janemail.com", "password":"1234qwert"}`,
 			expected: `{"message":"Invalid email format.","status":false}`,
-			code: 400,
+			code:     400,
 		},
 	}
 
@@ -47,20 +47,18 @@ func TestAuthHandler_SignUp(t *testing.T) {
 	RegisterHttpEndpoints(r, uc)
 
 	for _, tc := range tt {
-		t.Run(tc.name, func(t *testing.T){
-			//var inputJson = `{"username":"janedoe", "email": "jane@mail.com", "password":"1234qwert"}`
-
-			uc.On("SignUp", mock.AnythingOfType("*model.User")).Return(nil)
-			uc.On("GetUserByEmail", "jane@mail.com").Return(nil, nil)
-
+		t.Run(tc.name, func(t *testing.T) {
+			uc.On("RegisterAccount", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 			req := httptest.NewRequest("POST", "/api/v1/auth/sign-up", strings.NewReader(tc.input))
 			res := httptest.NewRecorder()
 
+			// When
 			r.ServeHTTP(res, req)
-			uc.AssertExpectations(t)
+
 			// Then
 			assert.Equal(t, tc.code, res.Code)
 			assert.Equal(t, tc.expected, res.Body.String())
+			uc.AssertExpectations(t)
 		})
 	}
 }
