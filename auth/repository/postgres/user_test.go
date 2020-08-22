@@ -1,10 +1,12 @@
-package repository
+package postgres
 
 import (
-	"context"
+	//"database/sql"
 	"database/sql/driver"
-	"log"
 	"regexp"
+
+	//"errors"
+	"log"
 	"testing"
 	"time"
 
@@ -21,9 +23,9 @@ func (a AnyTime) Match(v driver.Value) bool { // implements Argument interface
 	return ok
 }
 
-func TestStore(t *testing.T) {
-	u := &model.User{
-		Username: "johndoe",
+func TestUserRepo_Store(t *testing.T) {
+	u := &model.Account{
+		Username: "john",
 		Email:    "johndoe@gmail.com",
 		Password: "1234qwerty",
 	}
@@ -34,17 +36,16 @@ func TestStore(t *testing.T) {
 	}
 
 	defer db.Close()
+	const newId = 1
 
-	mock.ExpectPrepare(regexp.QuoteMeta("INSERT INTO users")).
+	mock.ExpectPrepare(regexp.QuoteMeta("INSERT INTO accounts")).
 		ExpectExec().
-		WithArgs(u.Username, u.Email, u.Password, AnyTime{}).
+		WithArgs(u.Username, u.Email, u.Password, false, AnyTime{}, nil).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	ctx := context.Background()
 	// Behaviour to be tested
 	userRepo := NewUserRepo(db)
-	err = userRepo.Create(ctx, u)
-
+	err = userRepo.Store(u.Username, u.Email, u.Password)
 	assert.NoError(t, err)
 
 	if err := mock.ExpectationsWereMet(); err != nil {
