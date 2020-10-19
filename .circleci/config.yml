@@ -1,21 +1,55 @@
-version: 2
+version: 2.1
 jobs:
   build:
+    parameters:
+      version:
+        type: string
+        default: "latest"
+      golint:
+        type: boolean
+        default: true
+      modules:
+        type: boolean
+        default: true
+      goproxy:
+        type: string
+        default: ""
     docker:
-      - image: circleci/golang:1.13
+      - image: circleci/golang:1.14
       - image: circleci/postgres:10.5-alpine
 
-    working_directory: /go/src/github.com/Gidraff/task-manager-usecase
-
+    working_directory: /go/src/github.com/Gidraff/task-manager-service
     environment:
       TEST_RESULTS: /tmp/test-results
+      GO111MODULE: "on"
+      GOPROXY: "<< parameters.goproxy >>"
 
     steps:
       - checkout
-      - setup_remote_docker
-      - run: go test -v ./...
+      - run:
+          name: "Fetch dependencies"
+          command: >
+            if [[ << parameters.modules >> = true ]]; then
+              go mod download
+              export GO111MODULE=on
+            else
+              go get -v ./...
+            fi
 
+      - run:
+          name: "Run golint"
+          command: >
+            if [ << parameters.version >> = "latest" ] && [ << parameters.golint >> = true ]; then
+              go get -u golang.org/x/lint/golint
+              golint ./...
+            fi
+      - setup_remote_docker
+      - run: make test
 
       - restore_cache:
           keys:
             - v1-pkg-cache
+workflows:
+  build:
+    jobs:
+      - build
