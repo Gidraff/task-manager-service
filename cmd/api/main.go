@@ -1,19 +1,16 @@
 package main
 
 import (
-	//"context"
 	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-
 	"github.com/Gidraff/task-manager-service/config"
 	"github.com/Gidraff/task-manager-service/model"
 	"github.com/Gidraff/task-manager-service/server"
 	_ "github.com/lib/pq"
-	//"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -41,8 +38,6 @@ func main() {
 			conf.GetString("database.port"),
 		)
 	}
-
-	// Create connection string
 
 	// Open db connection
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

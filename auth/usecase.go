@@ -7,5 +7,5 @@ import (
 // UseCase type
 type UseCase interface {
 	Register(username, email, password string) error
-	GetUserByEmail(email string) (*model.User, error)
+	GetUserByEmail(email string) (model.User, error)
 }

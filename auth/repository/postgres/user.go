@@ -4,6 +4,7 @@ import (
 	"github.com/Gidraff/task-manager-service/auth"
 	"github.com/Gidraff/task-manager-service/model"
 	"gorm.io/gorm"
+	"time"
 )
 
 type userRepo struct {
@@ -18,11 +19,9 @@ func NewUserRepo(db *gorm.DB) auth.UserRepository {
 
 // Store persists a new user to db
 func (ur *userRepo) Store(username, email, password string) error {
-	var err error
-	user := model.User{Username: username, Email: email, Password: password}
-
-	result := ur.Conn.Create(&user)
-	err = result.Error
+	user := model.User{Username: username, Email: email, Password: password, CreatedAt: time.Now()}
+	result := ur.Conn.Debug().Create(&user)
+	err := result.Error
 	if err != nil {
 		return err
 	}
@@ -30,14 +29,13 @@ func (ur *userRepo) Store(username, email, password string) error {
 }
 
 // FetchByEmail returns a user with the provided email
-func (ur *userRepo) FetchByEmail(value string) (*model.User, error) {
-	var err error
-	user := &model.User{}
+func (ur *userRepo) FetchByEmail(value string) (model.User, error) {
+	user := model.User{}
 	result := ur.Conn.Where("email = ? ", value).First(&user)
-	err = result.Error
+	err := result.Error
 	//err = ur.Conn.QueryRow(`SELECT user_id, username, email, password, active FROM users WHERE email=$1`, value).Scan(&id, &username, &email, &password, &active)
 	if err != nil {
-		return nil, err
+		return model.User{}, err
 	}
 	return user, nil
 }

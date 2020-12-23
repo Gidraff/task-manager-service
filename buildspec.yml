@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 19
+      golang: 1.13
+  build:
+    commands:
+      - echo "Building the go code"
+      - cd $CODEBUILD_SRC_DIR/task-manager-service
+      - make test
+      - make build
+artifacts:
+  secondary-artifacts:
+    golang_artifacts:
+      base-directory: golang-app
+      files:
+        - taskman

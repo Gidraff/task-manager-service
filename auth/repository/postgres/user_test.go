@@ -3,10 +3,10 @@ package postgres
 import (
 	//"database/sql"
 	"database/sql/driver"
-	//"regexp"
+	"regexp"
 
 	//"errors"
-	"log"
+	//"log"
 	"testing"
 	"time"
 
@@ -27,9 +27,10 @@ func (a AnyTime) Match(v driver.Value) bool { // implements Argument interface
 
 func TestUserRepo_Store(t *testing.T) {
 	u := &model.User{
-		Username: "john",
-		Email:    "johndoe@gmail.com",
-		Password: "1234qwerty",
+		Username:  "john",
+		Email:     "johndoe@gmail.com",
+		Password:  "1234qwerty",
+		CreatedAt: time.Now(),
 	}
 
 	db, mock, err := sqlmock.New()
@@ -43,16 +44,25 @@ func TestUserRepo_Store(t *testing.T) {
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+
+	//sqlInsert := `INSERT INTO "users" ("username","email","password","created_at") VALUES ($1,$2,$3,$4) RETURNING "users"."id"`
+	//regexp.QuoteMeta("INSERT INTO \"users\" (\"username\",\"email\",\"password\",\"created_at\") VALUES (?,?,?,?)")
 	mock.ExpectBegin()
-	mock.ExpectQuery(`INSERT INTO "users" (.+) RETURNING`).
-		WithArgs(u.Username, u.Email, u.Password, u.CreatedAt).
+	mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "users" ("username","email","password","created_at") VALUES ($1,$2,$3,$4) RETURNING "id"`)).
+		WithArgs(u.Username, u.Email, u.Password, AnyTime{}).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1))
+	mock.ExpectCommit()
 	// Behaviour to be tested
 	userRepo := NewUserRepo(gdb)
 	err = userRepo.Store(u.Username, u.Email, u.Password)
 	assert.NoError(t, err)
 
-	if err := mock.ExpectationsWereMet(); err != nil {
-		log.Fatalf("unfulfilled expectations: %s", err)
+	mock.ExpectationsWereMet()
+}
+
+func TestUserRepo_FetchByEmail(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("format")
 	}
 }

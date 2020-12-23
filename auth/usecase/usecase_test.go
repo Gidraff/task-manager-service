@@ -1,11 +1,12 @@
 package usecase
 
 import (
-	"errors"
+	//"errors"
 	"testing"
 
-	"github.com/Gidraff/task-manager-service/auth/repository/mock"
+	//"github.com/Gidraff/task-manager-service/auth/repository/mock"
 	"github.com/Gidraff/task-manager-service/model"
+	"github.com/Gidraff/task-manager-service/model/mock"
 	"github.com/stretchr/testify/assert"
 	mc "github.com/stretchr/testify/mock"
 )
@@ -23,8 +24,10 @@ func TestUseCase_Register(t *testing.T) {
 	t.Run("Success", func(t *testing.T) {
 		tempUser := user
 		tempUser.ID = 1
-		repo.On("FetchByEmail", mc.AnythingOfType("string")).Return(&model.User{}, nil).Once()
-		repo.On("Store", mc.Anything, mc.Anything, mc.Anything).Return(nil).Once()
+		repo.On("FetchByEmail", mc.AnythingOfType("string")).
+			Return(model.User{}, nil).Once()
+		repo.On("Store", mc.Anything, mc.Anything, mc.Anything).
+			Return(nil).Once()
 
 		_, err := uc.GetUserByEmail(user.Email)
 		assert.NoError(t, err)
@@ -32,13 +35,17 @@ func TestUseCase_Register(t *testing.T) {
 		assert.NoError(t, err)
 		repo.AssertExpectations(t)
 	})
+}
 
-	t.Run("duplicate user", func(t *testing.T) {
-		existingUser := user
-		repo.On("FetchByEmail", mc.AnythingOfType("string")).Return(existingUser, nil).Once()
-		repo.On("Store", mc.Anything, mc.Anything, mc.Anything).Return(errors.New("duplicate")).Once()
-		err := uc.Register(user.Username, user.Email, user.Password)
-		assert.Error(t, err)
+func TestUseCase_GetUserByEmail(t *testing.T) {
+	repo := new(mock.UserRepoMock)
+	uc := NewUseCase(repo)
+
+	t.Run("Fetch user by email", func(t *testing.T) {
+		email := "johndoe@gmail.com"
+		repo.On("FetchByEmail", email).Return(model.User{}, nil).Once()
+		_, err := uc.GetUserByEmail(email)
+		assert.NoError(t, err)
 		repo.AssertExpectations(t)
 	})
 }

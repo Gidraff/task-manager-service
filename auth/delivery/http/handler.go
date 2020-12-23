@@ -55,8 +55,8 @@ func (ah AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		helpers.Response(http.StatusBadRequest, err.Error(), w)
 		return
 	}
-	user, _ := ah.authUC.GetUserByEmail(account.Email)
-	if user != nil {
+	user, err := ah.authUC.GetUserByEmail(account.Email)
+	if user.Email == account.Email {
 		msg = "Email is taken. Try again"
 		helpers.Response(http.StatusConflict, msg, w)
 		return

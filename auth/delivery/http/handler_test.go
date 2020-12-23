@@ -1,16 +1,14 @@
 package http
 
 import (
-	"errors"
-	"fmt"
+	"github.com/Gidraff/task-manager-service/model"
+	"github.com/Gidraff/task-manager-service/model/mock"
+	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
+	mc "github.com/stretchr/testify/mock"
 	"net/http/httptest"
 	"strings"
 	"testing"
-
-	"github.com/Gidraff/task-manager-service/auth/usecase"
-	"github.com/gorilla/mux"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestAuthHandler_SignUp(t *testing.T) {
@@ -39,19 +37,20 @@ func TestAuthHandler_SignUp(t *testing.T) {
 		{
 			name:     "test invalid user email",
 			input:    `{"username":"janedoe", "email": "janemail.com", "password":"1234qwert"}`,
-			expected: `{"message":"Invalid email format."}`,
+			expected: `{"message":"Invalid email format"}`,
 			code:     400,
 		},
 	}
 
 	r := mux.NewRouter()
-	uc := new(usecase.AuthUseCaseMock)
+	uc := new(mock.AuthUseCaseMock)
 	RegisterHandler(r, uc)
 
 	for _, tc := range tt {
+		var testEmail = "jane2@gmail.com"
 		t.Run(tc.name, func(t *testing.T) {
-			uc.On("GetUserByEmail", mock.Anything).Return(nil)
-			uc.On("Register", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			uc.On("GetUserByEmail", testEmail).Return(model.User{}, nil)
+			uc.On("Register", mc.Anything, mc.Anything, mc.Anything).Return(nil)
 			req := httptest.NewRequest("POST", "/api/v1/auth/sign-up", strings.NewReader(tc.input))
 			res := httptest.NewRecorder()
 
@@ -63,27 +62,5 @@ func TestAuthHandler_SignUp(t *testing.T) {
 			uc.AssertExpectations(t)
 		})
 	}
-}
-
-func TestSignIn(t *testing.T) {
-	var testEmail = "testuser12@smail.com"
-	// Given
-	authData := `{"email": "testuser12@smail.com", "password":"45678jkj"}`
-
-	//expected := `{"message":"Invalid email format.","token":"adkfhkdhrbfbskdfbsgadcbd"}`
-	r := mux.NewRouter()
-	uc := new(usecase.AuthUseCaseMock)
-	RegisterHandler(r, uc)
-
-	uc.On("GetUserByEmail", testEmail).Return(nil, errors.New("record not found"))
-	req := httptest.NewRequest("POST", "/api/v1/auth/sign-in", strings.NewReader(authData))
-	res := httptest.NewRecorder()
-
-	// When
-	r.ServeHTTP(res, req)
-
-	assert.Equal(t, 200, res.Code)
-	fmt.Println(res.Body.String())
-	//assert.Equal(t, expected, res.Body.String())
 	uc.AssertExpectations(t)
 }

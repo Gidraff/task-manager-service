@@ -25,10 +25,10 @@ func (authUC *UseCase) Register(username, email, password string) error {
 }
 
 // GetUserByEmail returns type User
-func (authUC *UseCase) GetUserByEmail(email string) (*model.User, error) {
-	account, err := authUC.userAuthRepo.FetchByEmail(email)
+func (authUC *UseCase) GetUserByEmail(email string) (model.User, error) {
+	user, err := authUC.userAuthRepo.FetchByEmail(email)
 	if err != nil {
-		return nil, err
+		return model.User{}, err
 	}
-	return account, nil
+	return user, nil
 }
