@@ -2,70 +2,49 @@ package server
 
 import (
 	"context"
-
-	"fmt"
-	"github.com/Gidraff/task-manager-service/pkg/utils/helpers"
+	"database/sql"
 	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
+
+	//"database/sql"
+	"fmt"
+	"github.com/Gidraff/task-manager-service/auth"
+	authhttp "github.com/Gidraff/task-manager-service/auth/delivery/http"
+	authpostgres "github.com/Gidraff/task-manager-service/auth/repository/postgres"
+	authusecase "github.com/Gidraff/task-manager-service/auth/usecase"
+	lg "github.com/Gidraff/task-manager-service/pkg/utils/logger"
+	"github.com/gorilla/mux"
+	_ "github.com/hpcloud/tail/util"
+	"github.com/urfave/negroni"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-
-	"github.com/Gidraff/task-manager-service/auth"
-	authHTTP "github.com/Gidraff/task-manager-service/auth/delivery/http"
-	authPostgres "github.com/Gidraff/task-manager-service/auth/repository/postgres"
-	authUsecase "github.com/Gidraff/task-manager-service/auth/usecase"
-	"github.com/Gidraff/task-manager-service/project"
-	projectHTTP "github.com/Gidraff/task-manager-service/project/delivery/http"
-	projectPostgres "github.com/Gidraff/task-manager-service/project/repository/postgres"
-	projectUsecase "github.com/Gidraff/task-manager-service/project/usecase"
-	"github.com/Gidraff/task-manager-service/task"
-	taskHTTP "github.com/Gidraff/task-manager-service/task/delivery/http"
-	taskPostgres "github.com/Gidraff/task-manager-service/task/repository/postgres"
-	taskUsecase "github.com/Gidraff/task-manager-service/task/usecase"
-	"github.com/gorilla/mux"
-	"github.com/urfave/negroni"
 )
 
 // App encapsulate application' server
 type App struct {
 	httpServer *http.Server
 	authUC     auth.UseCase
-	taskUC     task.ITaskUsecase
-	projectUC  project.IProjectUsecase
+	logger     *lg.Logger
 }
 
 // NewApp return a instance of app
-func NewApp(db *gorm.DB) *App {
-	userAuthRepo := authPostgres.NewUserRepo(db)
-	projectRepo := projectPostgres.NewProjectRepo(db)
-	taskRepo := taskPostgres.NewTaskRepo(db)
+func NewApp(db *sql.DB, logger *lg.Logger) *App {
+	userAuthRepo := authpostgres.NewUserRepo(db)
 	return &App{
-		authUC:    authUsecase.NewUseCase(userAuthRepo),
-		taskUC:    taskUsecase.NewTaskUsecase(taskRepo),
-		projectUC: projectUsecase.NewProjectUsecase(projectRepo),
+		authUC: authusecase.NewUseCase(userAuthRepo),
 	}
 }
 
 // Run bootstraps the app's server
 func (a *App) Run(port string) error {
-	router := mux.NewRouter().StrictSlash(false)
+	router := mux.NewRouter()
 	n := negroni.New()
 	n.Use(negroni.NewLogger())
 	n.UseHandler(router)
 
-	//authR := router.PathPrefix("/api/v1/auth").Subrouter()
-	authMiddleware := mux.NewRouter()
-	router.PathPrefix("/api/v1/").Handler(negroni.New(
-		negroni.HandlerFunc(helpers.JwtMiddleware),
-		negroni.Wrap(authMiddleware),
-	))
-
 	// Register Endpoints
-	authHTTP.RegisterHandler(authMiddleware, a.authUC)
-	taskHTTP.RegisterHandler(authMiddleware, a.taskUC)
-	projectHTTP.RegisterHandler(authMiddleware, a.projectUC)
+	authhttp.RegisterHttpEndpoints(router, a.authUC)
 
 	a.httpServer = &http.Server{
 		Addr:           port,

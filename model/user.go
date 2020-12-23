@@ -2,12 +2,13 @@ package model
 
 import "time"
 
-// User encapsulate type account
-type User struct {
-	ID        uint64    `gorm:"primary_key;auto_increment" json:"id"`
-	Username  string    `gorm:"size:100;not null;" json:"username"`
-	Email     string    `gorm:"size:100;not null;unique" json:"email"`
-	Password  string    `gorm:"not null" json:"password"`
-	Projects  []Project `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;" json:"projects"`
-	CreatedAt time.Time `gorm:"not null" json:"created_at"`
+// User model
+type Account struct {
+	ID        uint
+	Username  string `json:"username" validate:"min=3,max=50,required"`
+	Email     string `json:"email" validate:"email,required"`
+	Password  string `json:"password" validate:"min=8,required"`
+	Active    bool   `json:"active" validate:"required"`
+	CreatedOn time.Time
+	LastLogin time.Time
 }
