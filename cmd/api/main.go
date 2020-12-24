@@ -21,7 +21,7 @@ func main() {
 	conf := config.LoadConfig(configPath)
 	var dsn string
 
-	if conf.GetString("ENV_NAME") != "dev" {
+	if conf.GetString("ENV") != "dev" {
 		dsn = fmt.Sprintf(
 			conf.GetString("DB_DSN"),
 			conf.GetString("DB_USER"),
