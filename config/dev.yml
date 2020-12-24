@@ -1,0 +1,16 @@
+dsn: "user=%s dbname=%s password=%s port=%s sslmode=disable TimeZone=Africa/Nairobi"
+ormDsn:
+port: ":8089"
+api_secret: "f23eqd4q8de"
+
+database:
+  host: postgres
+  port: 5432
+  user: taskmuser
+  name: taskmdb
+  password: taskmpasswd
+
+redis_dsn: "localhost:6379"
+
+context:
+  timeout: 2
