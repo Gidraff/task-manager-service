@@ -2,12 +2,11 @@
 
 pipeline {
   agent {
-    docker {
-      image 'golang:1.14.2-alpine3.11'
-    }
+    docker { image 'golang'}
   }
   environment {
     CI = 'true'
+    GOCACHE = 'off'
   }
   stages {
     stage ('Build') {
