@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-
 	// Load config file
 	path, _ := os.Getwd()
 	configPath := filepath.Join(path, "/config")
