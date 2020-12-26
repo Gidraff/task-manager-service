@@ -6,7 +6,7 @@ pipeline {
   }
   environment {
     CI = 'true'
-    GOCACHE = 'off'
+    XDG_CACHE_HOME = '/tmp/.cache'
   }
   stages {
     stage ('Build') {
