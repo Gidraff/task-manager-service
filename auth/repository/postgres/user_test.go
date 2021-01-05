@@ -59,10 +59,3 @@ func TestUserRepo_Store(t *testing.T) {
 
 	mock.ExpectationsWereMet()
 }
-
-func TestUserRepo_FetchByEmail(t *testing.T) {
-	db, mock, err := sqlmock.New()
-	if err != nil {
-		t.Fatalf("format")
-	}
-}
