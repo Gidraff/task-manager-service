@@ -21,7 +21,8 @@ pipeline {
     }
     stage ('BuildAndPublish') {
       steps {
-        sh 'make build && make push'
+        sh 'make image'
+        sh 'make push'
       }
     }
   }
