@@ -1,17 +1,18 @@
 #!/usr/bin/env groovy
 
 pipeline {
-  agent any
+
   environment {
     CI = 'true'
     XDG_CACHE_HOME = '/tmp/.cache'
-    imagename = "gidraff/taskman"
-    registryCredential = 'yenigul-dockerhub'
+    IMAGENAME = "gidraff/taskman"
+    REGISTRYCREDENTIALS = 'yenigul-dockerhub'
   }
+  agent any
   stages {
     agent {
         docker { image 'golang'}
-      }
+     }
     stage ('Build') {
       steps {
         sh 'go build ./...'
@@ -25,14 +26,7 @@ pipeline {
     stage ('BuildAndPublish') {
       steps {
         script {
-            dockerImage = docker.build imagename
-        }
-        script {
-          docker.withRegistry( '', registryCredential ) {
-            dockerImage.push("$BUILD_NUMBER")
-             dockerImage.push('latest')
-
-          }
+            dockerImage = docker.build IMAGENAME
         }
       }
     }
