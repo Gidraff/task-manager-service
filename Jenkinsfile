@@ -5,6 +5,8 @@ pipeline {
   environment {
     CI = 'true'
     XDG_CACHE_HOME = '/tmp/.cache'
+    imagename = "gidraff/taskman"
+    registryCredential = 'yenigul-dockerhub'
   }
   stages {
     agent {
@@ -21,10 +23,17 @@ pipeline {
       }
     }
     stage ('BuildAndPublish') {
-      agent any
       steps {
-        sh 'make image'
-        sh 'make push'
+        script {
+            dockerImage = docker.build imagename
+        }
+        script {
+          docker.withRegistry( '', registryCredential ) {
+            dockerImage.push("$BUILD_NUMBER")
+             dockerImage.push('latest')
+
+          }
+        }
       }
     }
   }
