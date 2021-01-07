@@ -6,7 +6,7 @@ pipeline {
     CI = 'true'
     XDG_CACHE_HOME = '/tmp/.cache'
     IMAGENAME = "gidraff/taskman"
-    REGISTRYCREDENTIALS = 'yenigul-dockerhub'
+    REGISTRYCREDENTIAL = 'yenigul-dockerhub'
   }
   agent any
   stages {
@@ -22,11 +22,22 @@ pipeline {
         sh 'go test ./...'
       }
     }
-    stage ('BuildAndPublish') {
+    stage ('BuildImage') {
       agent any
       steps {
         script {
             dockerImage = docker.build IMAGENAME
+        }
+      }
+    }
+    stage ('PublishImage') {
+      agent any
+      steps {
+        script {
+            docker.withRegistry( '', REGISTRYCREDENTIAL ) {
+                dockerImage.push("$BUILD_NUMBER")
+                dockerImage.push('latest')
+            }
         }
       }
     }
