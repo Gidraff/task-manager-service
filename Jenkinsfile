@@ -6,7 +6,7 @@ pipeline {
     CI = 'true'
     XDG_CACHE_HOME = '/tmp/.cache'
     IMAGENAME = "gidraff/taskman"
-    REGISTRYCREDENTIAL = 'yenigul-dockerhub'
+    REGISTRYCREDENTIAL = 'docker-hub-creds'
   }
   agent any
   stages {
