@@ -10,20 +10,20 @@ pipeline {
   }
   agent any
   stages {
-    agent {
-        docker { image 'golang'}
-     }
     stage ('Build') {
+      agent { docker { image 'golang'} }
       steps {
         sh 'go build ./...'
       }
     }
     stage ('Test') {
+      agent { docker { image 'golang'} }
       steps {
         sh 'go test ./...'
       }
     }
     stage ('BuildAndPublish') {
+      agent any
       steps {
         script {
             dockerImage = docker.build IMAGENAME
