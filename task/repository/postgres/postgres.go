@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// QueryWithIDAndProjectIDCondition query condtion
+// QueryWithIDAndProjectIDCondition query condition
 const QueryWithIDAndProjectIDCondition = "id = ? and project_id = ?"
 
 type taskRepo struct {

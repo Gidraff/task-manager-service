@@ -2,7 +2,7 @@ package task
 
 import "github.com/Gidraff/task-manager-service/model"
 
-// ITaskRepository interface defins repo method
+// ITaskRepository interface define repo method
 type ITaskRepository interface {
 	Save(projectID, userID uint64, title, description, priority, status string) error
 	FetchAll(projectID uint64) (*[]model.Task, error)
