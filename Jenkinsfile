@@ -19,5 +19,10 @@ pipeline {
         sh 'go test ./...'
       }
     }
+    stage ('BuildAndPublish') {
+      steps {
+        sh 'make build && make push'
+      }
+    }
   }
 }
