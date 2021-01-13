@@ -8,10 +8,9 @@ pipeline {
     IMAGENAME = "gidraff/taskman"
     REGISTRYCREDENTIAL = 'docker-hub-creds'
   }
-  agent any
+  agent { docker { image 'golang'} }
   stages {
     stage ('Build') {
-      agent { docker { image 'golang'} }
       steps {
         sh 'go build ./...'
       }
@@ -39,6 +38,12 @@ pipeline {
                 dockerImage.push('latest')
             }
         }
+      }
+    }
+    stage ('Remove docker images') {
+      steps {
+        sh 'docker rmi $IMAGENAME:$BUILD_NUMBER'
+        sh 'docker rmi $IMAGENAME:latest'
       }
     }
   }
