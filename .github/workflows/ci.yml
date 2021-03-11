@@ -21,9 +21,17 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
     - name: Test
       run: go test -v ./...
 
+  buildAndPushDockerImage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
     - name: Push to Docker Hub
       uses: docker/build-push-action@v1
       with:
