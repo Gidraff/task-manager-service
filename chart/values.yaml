@@ -1,29 +1,69 @@
 # Default values for chart.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
+appMesh:
+  enabled: false
+  outsideTrafficAllowed: true
+  # fargatePodServiceAccount: # envoy-fargate-pod-svcaccount # Specify when running on EKS Fargate nodes
+  #gatewayRouteMatchPrefix: # Supply override here, otherwise it's "/service-name"
 
+  healthCheck:
+    healthyThreshold: 2
+    intervalMillis: 5000
+    path: /api/v1/status # Must return 200, not Redirect (3xx) or 4xx or 5xx
+    protocol: http
+    timeoutMillis: 2000
+    unhealthyThreshold: 2
 replicaCount: 2
 
+database:
+  enabled: true
+  host: taskmdb.cvemjq2nn52m.us-east-1.rds.amazonaws.com
+  username: taskmuser
+  password: ''
+  dbname: taskmdb
+  port: 5432
+  sslmode: disable
+  timeZone: 'Africa/Nairobi'
+  existingSecret: 'dev-db-secret'
+  existingSecretKey: 'PG_DB_PASSWORD'
+  databaseUrlTemplate: ''
+
+databaseEnvVarsMap:
+  URL: 'PG_DB_URL'
+  USERNAME: 'PG_DB_USERNAME'
+  PASSWORD: 'PG_DB_PASSWORD'
+server:
+  port: 8089
+serverEnvVarsMap:
+  PORT: 'SERVER_PORT'
+
 image:
-  repository: gidraff/taskman
+  repository: 503729832345.dkr.ecr.us-east-1.amazonaws.com/taskman
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
-
+  tag: 1.19.0
+backend:
+  envAddresses:
+    Settings__ServiceBaseUrl: color-canary
 imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: 'envoy-proxy'
 
-podAnnotations: {}
+podAnnotations:
+  # appmesh.k8s.aws/sidecarInjectorWebhook: enabled
+  appmesh.k8s.aws/mesh: my-mesh
+  # appmesh.k8s.aws/secretMounts: "dev-tls-db:/etc/keys/dev"
+
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -38,11 +78,15 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8080
+
+deployment:
+  containerPort: 8089
 
 ingress:
   enabled: false
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:

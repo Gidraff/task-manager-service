@@ -60,3 +60,17 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Defines a "function" converting a backend service address into a URL
+*/}}
+{{- define "backendUrl" -}}
+{{- $appMeshEnabled := get . "appMeshEnabled" -}}
+{{- $backendAddress := get . "backendAddress" -}}
+{{- $namespace := get . "namespace" -}}
+{{- if $appMeshEnabled -}}
+{{- printf "http://%s.%s.svc.cluster.local/" $backendAddress $namespace -}}
+{{- else -}}
+{{- printf "http://%s/" $backendAddress -}}
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,19 @@
+{{- if .Values.appMesh.enabled -}}
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualService
+metadata:
+  name: {{ template "chart.fullname" . }}
+  namespace: dev
+  labels:
+    app: {{ template "chart.name" . }}
+    chart: {{ template "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  meshName: my-mesh
+  awsName: {{ template "chart.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  provider:
+    virtualNode:
+      virtualNodeRef:
+        name: {{ template "chart.fullname" . }}
+{{- end }}

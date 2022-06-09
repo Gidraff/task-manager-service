@@ -4,13 +4,14 @@ import (
 	"context"
 
 	"fmt"
-	"github.com/Gidraff/task-manager-service/pkg/utils/helpers"
-	log "github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/Gidraff/task-manager-service/pkg/utils/helpers"
+	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 
 	"github.com/Gidraff/task-manager-service/auth"
 	authHTTP "github.com/Gidraff/task-manager-service/auth/delivery/http"
@@ -49,12 +50,15 @@ func NewApp(db *gorm.DB) *App {
 }
 
 // Run bootstraps the app's server
-func (a *App) Run(port string) error {
+func (a *App) Run() error {
 	router := mux.NewRouter().StrictSlash(false)
 	n := negroni.New()
 	n.Use(negroni.NewLogger())
 	n.UseHandler(router)
 
+	router.HandleFunc("/api/v1/status", func(w http.ResponseWriter, r *http.Request) {
+		helpers.Response(http.StatusOK, "Up!", w)
+	}).Methods("GET")
 	//authR := router.PathPrefix("/api/v1/auth").Subrouter()
 	authMiddleware := mux.NewRouter()
 	router.PathPrefix("/api/v1/").Handler(negroni.New(
@@ -68,7 +72,7 @@ func (a *App) Run(port string) error {
 	projectHTTP.RegisterHandler(authMiddleware, a.projectUC)
 
 	a.httpServer = &http.Server{
-		Addr:           port,
+		Addr:           ":8089",
 		Handler:        n,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,

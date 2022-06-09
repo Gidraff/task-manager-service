@@ -1,0 +1,11 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: dev-cert-db
+  namespace: dev
+spec:
+  dnsNames:
+    - "task-manager.dev.svc.cluster.local"
+  secretName: dev-tls-db
+  issuerRef:
+    name: ca-issuer

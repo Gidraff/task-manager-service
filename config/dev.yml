@@ -1,16 +1,17 @@
-dsn: "user=%s dbname=%s password=%s port=%s sslmode=disable TimeZone=Africa/Nairobi"
+dsn: 'host=taskman-db.cvemjq2nn52m.us-east-1.rds.amazonaws.com user=taskmuser password=taskmpasswd dbname=taskmandb port=5432 sslmode=disable TimeZone=Africa/Nairobi'
+
 ormDsn:
-port: ":8089"
-api_secret: "f23eqd4q8de"
+port: ':8089'
+api_secret: 'f23eqd4q8de'
 
 database:
-  host: postgres
+  host: taskman-db.cvemjq2nn52m.us-east-1.rds.amazonaws.com
   port: 5432
   user: taskmuser
   name: taskmdb
   password: taskmpasswd
 
-redis_dsn: "localhost:6379"
+redis_dsn: 'localhost:6379'
 
 context:
   timeout: 2

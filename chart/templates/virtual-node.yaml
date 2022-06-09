@@ -1,0 +1,29 @@
+{{- if .Values.appMesh.enabled -}}
+apiVersion: appmesh.k8s.aws/v1beta2
+kind: VirtualNode
+metadata:
+  name: {{ template "chart.fullname" . }}
+  namespace: dev
+  labels:
+    app: {{ template "chart.name" . }}
+    chart: {{ template "chart.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  meshName: my-mesh
+  podSelector:
+    matchLabels:
+      app: {{ template "chart.name" . }}
+      release: {{ .Release.Name }}
+  listeners:
+  - portMapping:
+      port: 8089
+      protocol: http
+  backends:
+  - virtualService:
+      virtualServiceRef:
+        name: {{ template "chart.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  serviceDiscovery:
+    dns:
+      hostname: {{ template "chart.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+{{- end }}

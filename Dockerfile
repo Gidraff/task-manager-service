@@ -1,26 +1,22 @@
 # Builder
-FROM golang:1.14.2-alpine3.11 as builder
-
-RUN apk update && apk upgrade && \
-    apk --update add git make
+FROM golang:1.18.3-bullseye
 
 WORKDIR /app
 
-COPY . .
+COPY . . 
+
+ARG host
+ARG username
+ARG password
+ARG name
+
+ENV POSTGRES_HOST=$host
+ENV POSTGRES_USER=$username
+ENV POSTGRES_PASSWORD=$password
+ENV POSTGRES_DB=$name
 
 RUN make engine
 
-# Distribution
-FROM alpine:latest
-
-RUN apk update && apk upgrade && \
-    apk --update --no-cache add tzdata && \
-    mkdir /app
-
-WORKDIR /app
-
 EXPOSE 8089
 
-COPY --from=builder /app/bin/api /app
-
-CMD /app/api
+ENTRYPOINT ["/app/bin/api"]

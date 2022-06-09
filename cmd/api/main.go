@@ -2,44 +2,38 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+
 	"github.com/Gidraff/task-manager-service/config"
 	"github.com/Gidraff/task-manager-service/model"
 	"github.com/Gidraff/task-manager-service/server"
 	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"log"
-	"os"
-	"path/filepath"
 )
 
 func main() {
-	// Load config file
+	// Load configuration parameters
 	path, _ := os.Getwd()
 	configPath := filepath.Join(path, "/config")
 	conf := config.LoadConfig(configPath)
-	var dsn string
 
-	if conf.GetString("ENV") != "dev" {
-		dsn = fmt.Sprintf(
-			conf.GetString("DB_DSN"),
-			conf.GetString("DB_USER"),
-			conf.GetString("DB_NAME"),
-			conf.GetString("DB_PASSWORD"),
-			conf.GetString("DB_PORT"),
-		)
-	} else {
-		dsn = fmt.Sprintf(
-			conf.GetString("dsn"),
-			conf.GetString("database.user"),
-			conf.GetString("database.name"),
-			conf.GetString("database.password"),
-			conf.GetString("database.port"),
-		)
-	}
+	dbHost := conf.GetString("POSTGRES_HOST")
+	username := conf.GetString("POSTGRES_USER")
+	password := conf.GetString("POSTGRES_PASSWORD")
+	dbName := conf.GetString("POSTGRES_DB")
+	//dbPort := conf.GetString("PG_PORT")
+
+	dsn := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s ", dbHost, username, dbName, password)
+	fmt.Println("dns", dsn)
 
 	// Open db connection
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("DB: Error while establishing connection %+v", err)
 	}
@@ -49,7 +43,7 @@ func main() {
 
 	// Run app
 	app := server.NewApp(db)
-	if err := app.Run(conf.GetString("port")); err != nil {
+	if err := app.Run(); err != nil {
 		log.Fatalf("%s", err.Error())
 	}
 }
