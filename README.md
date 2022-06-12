@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/Gidraff/task-manager-service/tree/develop.svg?style=svg)](https://circleci.com/gh/Gidraff/task-manager-service/?branch=develop)
 #### TaskMan RESTful API built in Go
 The service allows user to divided work into small manageable tasks, providing CRUD operations over RESTful API.
 
