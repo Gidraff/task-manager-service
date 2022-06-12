@@ -13,7 +13,7 @@ The service allows user to divided work into small manageable tasks, providing C
 #### Prerequisite
 To setup, you will first have to grab a copy of this project by cloning it into your local machine. After you've cloned the repo make sure you have the following installed: 
 
-- Go version: `go1.13.7`
+- Go version: `go1.18.2`
 - Docker engine
 - Make
 - Postgresql
