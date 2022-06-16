@@ -57,7 +57,7 @@ jobs:
     - name: Output step
       env:
         NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
-      run: echo "new tag "${{ NEW_TAG }}
+      run: echo "new tag "${{ env.NEW_TAG }}
 
     - name: Push to Docker Hub
       uses: docker/build-push-action@v2
