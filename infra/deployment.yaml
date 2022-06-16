@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels: 
+    app: taskman
+spec:
+  replicas: 2
+  selector: 
+    matchLabels: 
+      app: taskman
+  template:
+    metadata: 
+      labels:
+        app: taskman
+    spec:
+      containers:
+      - name: taskman
+        image: gidraff/taskman:develop
+        ports:
+        - containerPort: 8089

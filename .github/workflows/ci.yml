@@ -20,6 +20,11 @@ jobs:
 
     - name: Build
       run: go build -v ./...
+      env:
+        POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+        POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
   test:
     needs: build
@@ -35,11 +40,24 @@ jobs:
     - name: Test
       run: go test -v ./...
 
+
+
   buildAndPushDockerImage:
     needs: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
+    - name:  'Automated Version Bump'
+      id: version-bump
+      uses:  'phips28/gh-action-bump-version@master'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Output step
+      env:
+        NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+      run: echo "new tag $NEW_TAG"
 
     - name: Push to Docker Hub
       uses: docker/build-push-action@v1
@@ -48,4 +66,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: gidraff/taskman
         registry: docker.io
-        tag_with_ref: true
+        tags: ${{ steps.version-bump.outputs.newTag }}
