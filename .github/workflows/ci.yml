@@ -55,4 +55,4 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: gidraff/taskman
         registry: docker.io
-        tags_with_ref: true 
+        tag_with_ref: true 
